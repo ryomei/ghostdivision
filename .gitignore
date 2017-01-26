@@ -4,6 +4,7 @@
 [Tt]emp/
 [Oo]bj/
 [Bb]uild
+[Bb]uilds
 /[Ll]ibrary/
 sysinfo.txt
 *.stackdump
@@ -33,3 +34,4 @@ sysinfo.txt
 ehthumbs.db
 [Tt]humbs.db
 [Dd]esktop.ini
+

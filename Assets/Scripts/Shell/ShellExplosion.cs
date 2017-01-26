@@ -8,7 +8,9 @@ public class ShellExplosion : MonoBehaviour
     public float m_MaxDamage = 100f;                  
     public float m_ExplosionForce = 1000f;            
     public float m_MaxLifeTime = 2f;                  
-    public float m_ExplosionRadius = 5f;              
+    public float m_ExplosionRadius = 5f;
+
+    private TankHealthPUN m_CurrentTarget;
 
 
     private void Start()
@@ -28,23 +30,31 @@ public class ShellExplosion : MonoBehaviour
             if (!targetRigidBody) continue;
 
             targetRigidBody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
-            TankHealth targetHealth = targetRigidBody.GetComponent<TankHealth>();
 
+            var targetHealth = targetRigidBody.GetComponent<TankHealthPUN>();
             if (!targetHealth) continue;
 
             float damage = CalculateDamage(targetRigidBody.position);
             targetHealth.TakeDamage(damage);
         }
 
-        m_ExplosionParticles.transform.parent = null;
-        var explosionParticles = Instantiate(m_ExplosionParticles).GetComponent<ParticleSystem>();
+        var cloneParticles = Instantiate(m_ExplosionParticles);
+        var explosionParticles = cloneParticles.GetComponent<ParticleSystem>();
         explosionParticles.transform.position = transform.position;
+        explosionParticles.transform.parent = null;
         explosionParticles.Play();
-        m_ExplosionAudio.Play();
-        Destroy(explosionParticles.gameObject, explosionParticles.main.duration);
+        Destroy(explosionParticles, explosionParticles.main.duration);
+        Destroy(cloneParticles.gameObject, explosionParticles.main.duration);
+
+        var cloneAudio = Instantiate(m_ExplosionAudio);
+        var audioComponent = cloneAudio.GetComponent<AudioSource>();
+        audioComponent.transform.parent = null;
+        audioComponent.Play();
+        Destroy(audioComponent, audioComponent.clip.length);
+        Destroy(cloneAudio.gameObject, audioComponent.clip.length);
+
         Destroy(gameObject);
     }
-
 
     private float CalculateDamage(Vector3 targetPosition)
     {
